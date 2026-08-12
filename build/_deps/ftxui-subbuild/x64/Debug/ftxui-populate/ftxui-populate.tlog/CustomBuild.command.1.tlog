@@ -1,0 +1,162 @@
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-MKDIR.RULE
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-src
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-build
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/tmp
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-DOWNLOAD.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/tmp/ftxui-populate-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-UPDATE.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps\ftxui-src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/tmp/ftxui-populate-gitupdate.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-PATCH.RULE
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-CONFIGURE.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps\ftxui-build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-BUILD.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps\ftxui-build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-INSTALL.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps\ftxui-build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\6C9BA60D59ADB68A81BDEAC529502030\FTXUI-POPULATE-TEST.RULE
+setlocal
+cd D:\workspace\dashtype\build\_deps\ftxui-build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-test
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\39325F9CFF84488D7D7D93283FCC5C15\FTXUI-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory D:/workspace/dashtype/build/_deps/ftxui-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/CMakeFiles/Debug/ftxui-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch D:/workspace/dashtype/build/_deps/ftxui-subbuild/ftxui-populate-prefix/src/ftxui-populate-stamp/Debug/ftxui-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKEFILES\506E0E12FFA3102E51EF6DDBB0E055C6\FTXUI-POPULATE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\WORKSPACE\DASHTYPE\BUILD\_DEPS\FTXUI-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/workspace/dashtype/build/_deps/ftxui-subbuild -BD:/workspace/dashtype/build/_deps/ftxui-subbuild --check-stamp-file D:/workspace/dashtype/build/_deps/ftxui-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
