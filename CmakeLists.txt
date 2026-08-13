@@ -12,5 +12,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ftxui)
 
-add_executable(dashtype src/main.cpp src/cli_parser.cpp src/text_buffer.cpp src/typing_engine.cpp src/metrics.cpp src/typing_screen.cpp)
+add_executable(dashtype
+  src/main.cpp
+  src/cli_parser.cpp
+  src/text_buffer.cpp
+  src/typing_engine.cpp
+  src/metrics.cpp
+  src/typing_screen.cpp
+  src/personal_best.cpp
+  src/results_screen.cpp
+  src/home_screen.cpp
+)
+
 target_link_libraries(dashtype PRIVATE ftxui::screen ftxui::dom ftxui::component)

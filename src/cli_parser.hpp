@@ -11,21 +11,11 @@ enum class Command {
     Config,
     Version,
     Help,
-    Uknown
+    Unknown
 };
 
-
-enum class Mode { 
-    Words, 
-    Quotes
-};
-
-enum class Difficulty {
-    Easy,
-    Medium,
-    Hard
-};
-
+enum class Mode { Words, Quotes };
+enum class Difficulty { Easy, Medium, Hard };
 
 struct AppConfig {
     Command command = Command::Home;
@@ -36,5 +26,7 @@ struct AppConfig {
     bool numbers = false;
 };
 
-
 AppConfig parseArgs(int argc, char** argv);
+
+std::string toString(Mode mode);
+std::string toString(Difficulty difficulty);

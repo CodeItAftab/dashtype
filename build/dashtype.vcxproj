@@ -323,6 +323,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\workspace\dashtype\src\typing_engine.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\metrics.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\typing_screen.cpp" />
+    <ClCompile Include="D:\workspace\dashtype\src\personal_best.cpp" />
+    <ClCompile Include="D:\workspace\dashtype\src\results_screen.cpp" />
+    <ClCompile Include="D:\workspace\dashtype\src\home_screen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\workspace\dashtype\build\ZERO_CHECK.vcxproj">

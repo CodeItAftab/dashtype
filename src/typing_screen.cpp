@@ -5,7 +5,9 @@
 #include <ftxui/component/event.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/terminal.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -17,8 +19,6 @@ namespace {
 
 enum class ScreenState { WaitingToStart, Running, ConfirmQuit, Finished };
 
-// Splits text into lines no wider than `width`, breaking on spaces only.
-// Returns pairs of (starting index into original text, line content).
 std::vector<std::pair<std::size_t, std::string>> wrapText(const std::string& text, int width) {
     std::vector<std::pair<std::size_t, std::string>> lines;
     std::size_t lineStart = 0;
@@ -59,18 +59,19 @@ Color timerColor(double remaining, double total) {
     double pct = remaining / total;
     if (pct > 0.5) return Color::White;
     if (pct > 0.25) return Color::Yellow;
-    if (pct > 0.10) return Color::RGB(255, 140, 0);  // orange
+    if (pct > 0.10) return Color::RGB(255, 140, 0);
     return Color::Red;
 }
 
 }  // namespace
 
-TypingScreenResult runTypingScreen(const std::string& targetText, int durationSeconds) {
+TypingScreenResult runTypingScreen(const std::string& targetText, int durationSeconds,
+                                    const std::string& configSummary) {
     TypingEngine engine(targetText);
     TypingScreenResult result;
 
     ScreenState state = ScreenState::WaitingToStart;
-    int confirmSelected = 0;  // 0 = Yes, 1 = No
+    int confirmSelected = 0;
 
     std::chrono::steady_clock::time_point startTime;
     std::atomic<bool> tickerRunning{true};
@@ -79,8 +80,6 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
 
     auto screen = ScreenInteractive::Fullscreen();
 
-    // Background ticker: wakes the UI loop every 100ms so the timer/state
-    // updates even with no keypresses, and takes periodic WPM samples.
     std::thread ticker([&] {
         while (tickerRunning) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -99,6 +98,7 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
                 }
                 if (elapsed >= durationSeconds) {
                     state = ScreenState::Finished;
+                    screen.Exit();
                 }
             }
             screen.PostEvent(Event::Custom);
@@ -116,14 +116,15 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
         Element timerText = text(std::to_string(remainingWhole)) | bold |
                              color(timerColor(remaining, durationSeconds)) | center;
 
-        // Build wrapped lines and find which line the cursor is on.
-        auto lines = wrapText(targetText, 60);
+        int termWidth = Terminal::Size().dimx;
+        int wrapWidth = std::max(20, termWidth - 8);
+
+        auto lines = wrapText(targetText, wrapWidth);
         std::size_t cursorLine = 0;
         for (std::size_t li = 0; li < lines.size(); ++li) {
             if (engine.cursorPos() >= lines[li].first) cursorLine = li;
         }
 
-        // Show a window of up to 4 lines, centered around the cursor line.
         int windowSize = 4;
         int startLine = static_cast<int>(cursorLine) - 1;
         if (startLine < 0) startLine = 0;
@@ -149,27 +150,40 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
                 }
                 chars.push_back(charEl);
             }
-            // If cursor sits exactly at end-of-line boundary and there are
-            // extra chars pending, show them appended (rare edge case: only
-            // relevant on the very last line).
             textLines.push_back(hbox(chars));
         }
 
         Element typingArea = vbox(textLines) | center;
 
+        Element footer;
         if (state == ScreenState::WaitingToStart) {
             typingArea = vbox({
                 typingArea,
                 text(""),
                 text("Start typing to begin...") | dim | center,
             });
+            footer = vbox({
+                text(configSummary) | dim | center,
+                hbox({
+                    text("Esc") | bold, text(" Back to menu"),
+                }) | dim | center,
+            });
+        } else {
+            footer = hbox({
+                text("Esc") | bold, text(" Quit    "),
+                text("Backspace") | bold, text(" Fix mistake"),
+            }) | center;
         }
 
         Element mainView = vbox({
             timerText,
             text(""),
             typingArea,
-        }) | border | center;
+            filler(),
+            separator(),
+            footer,
+        }) | border | size(WIDTH, GREATER_THAN, termWidth - 2) |
+             size(HEIGHT, GREATER_THAN, 12);
 
         if (state == ScreenState::ConfirmQuit) {
             Element dialog = vbox({
@@ -181,6 +195,8 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
                     text(confirmSelected == 1 ? "> No" : "  No") |
                         (confirmSelected == 1 ? bold : dim),
                 }) | center,
+                text(""),
+                text("\u2190/\u2192 Select   Enter Confirm") | dim | center,
             }) | border | center;
             return dialog;
         }
@@ -200,16 +216,23 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
                 if (confirmSelected == 0) {
                     result.quit = true;
                     state = ScreenState::Finished;
+                    screen.Exit();
                 } else {
                     state = ScreenState::Running;
                 }
                 return true;
             }
-            return true;  // swallow all other input while dialog is open
+            return true;
         }
 
         if (event == Event::Escape) {
-            if (state == ScreenState::Running || state == ScreenState::WaitingToStart) {
+            if (state == ScreenState::WaitingToStart) {
+                result.backToConfig = true;
+                state = ScreenState::Finished;
+                screen.Exit();
+                return true;
+            }
+            if (state == ScreenState::Running) {
                 state = ScreenState::ConfirmQuit;
                 confirmSelected = 0;
                 return true;
@@ -233,6 +256,7 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
                 engine.onChar(c);
                 if (engine.cursorPos() >= targetText.size()) {
                     state = ScreenState::Finished;
+                    screen.Exit();
                 }
             }
             return true;
@@ -241,16 +265,7 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
         return false;
     });
 
-    // Exit the FTXUI loop once we reach Finished. We poll state via the
-    // same ticker-driven redraws.
-    auto withExit = CatchEvent(component, [&](Event) {
-        if (state == ScreenState::Finished) {
-            screen.Exit();
-        }
-        return false;  // never swallow; just watch for exit condition
-    });
-
-    screen.Loop(withExit);
+    screen.Loop(component);
 
     tickerRunning = false;
     ticker.join();
@@ -262,7 +277,8 @@ TypingScreenResult runTypingScreen(const std::string& targetText, int durationSe
         finalDuration = durationSeconds;
     }
 
-    result.completed = !result.quit;
+    result.completed = !result.quit && !result.backToConfig;
     result.metrics = computeResultMetrics(engine, finalDuration, samples);
+    result.samples = samples;
     return result;
 }
