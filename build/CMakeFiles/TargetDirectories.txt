@@ -1,3 +1,4 @@
+D:/workspace/dashtype/build/CMakeFiles/sqlite3lib.dir
 D:/workspace/dashtype/build/CMakeFiles/dashtype.dir
 D:/workspace/dashtype/build/CMakeFiles/PACKAGE.dir
 D:/workspace/dashtype/build/CMakeFiles/INSTALL.dir

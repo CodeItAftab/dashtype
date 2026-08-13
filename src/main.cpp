@@ -3,6 +3,10 @@
 #include "typing_screen.hpp"
 #include "results_screen.hpp"
 #include "home_screen.hpp"
+#include "dataset_manager.hpp"
+#include "database.hpp"
+#include "downloader.hpp"
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -11,12 +15,12 @@
 
 namespace {
 
-std::vector<std::string> wordPool = {
-    "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
-    "keyboard", "practice", "speed", "accuracy", "rhythm", "steady",
-    "type", "words", "focus", "flow", "test", "code", "build",
-    "project", "system", "design", "simple", "clean", "logic",
-};
+DatasetManager g_dataset;
+Database g_db;
+
+const char* kWordListHost = "raw.githubusercontent.com";
+const char* kWordListPath = "/first20hours/google-10000-english/master/google-10000-english.txt";
+const char* kWordListDest = "data/words/common-1k.txt";
 
 std::string configSummary(const AppConfig& config) {
     return std::to_string(config.timeSeconds) + "s \u00b7 " +
@@ -42,12 +46,36 @@ void printHelp() {
               << "  --numbers\n";
 }
 
-// Runs typing tests using `config`, looping on "New Test" until the user
-// picks Exit or quits mid-test.
+void printStats() {
+    StatsSummary stats = g_db.overallStats();
+    std::cout << "\n--- Stats ---\n";
+    std::cout << "Total tests: " << stats.totalTests << "\n";
+    std::cout << "Average accuracy: " << stats.avgAccuracy << "%\n";
+    for (auto& [duration, best] : stats.bestByDuration) {
+        std::cout << "Best WPM (" << duration << "s): ";
+        if (best.has_value()) std::cout << *best << "\n";
+        else std::cout << "no data yet\n";
+    }
+}
+
+void printHistory() {
+    auto records = g_db.recentHistory(10);
+    std::cout << "\n--- Recent Tests ---\n";
+    if (records.empty()) {
+        std::cout << "No tests recorded yet.\n";
+        return;
+    }
+    for (auto& r : records) {
+        std::cout << r.timestamp << "  " << r.durationSeconds << "s  "
+                  << r.mode << "/" << r.difficulty << "  "
+                  << r.wpm << " WPM  " << r.accuracyPercent << "% acc\n";
+    }
+}
+
 void runTypingLoop(const AppConfig& config) {
     bool keepGoing = true;
     while (keepGoing) {
-        TextBuffer buffer(wordPool);
+        TextBuffer buffer(g_dataset.makeGenerator(config));
         std::size_t estimatedChars =
             static_cast<std::size_t>(config.timeSeconds * 13) + 100;
         buffer.ensureAheadOf(0, estimatedChars);
@@ -61,7 +89,7 @@ void runTypingLoop(const AppConfig& config) {
         }
 
         ResultsAction action = runResultsScreen(
-            result.metrics, result.samples, config.timeSeconds);
+            result.metrics, result.samples, config, g_db);
 
         keepGoing = (action == ResultsAction::NewTest);
     }
@@ -73,11 +101,13 @@ int main(int argc, char** argv) {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     AppConfig config = parseArgs(argc, argv);
 
+    g_dataset.loadAll();
+    g_db.open("dashtype.db");
+
     switch (config.command) {
-        case Command::Start: {
+        case Command::Start:
             runTypingLoop(config);
             break;
-        }
 
         case Command::Version:
             std::cout << "dashtype 0.1.0 (development)\n";
@@ -86,6 +116,23 @@ int main(int argc, char** argv) {
         case Command::Help:
             printHelp();
             break;
+
+        case Command::Stats:
+            printStats();
+            break;
+
+        case Command::History:
+            printHistory();
+            break;
+
+        case Command::Download:
+        case Command::Update: {
+            std::cout << "Downloading typing material...\n";
+            DownloadResult dl = downloadWordList(kWordListHost, kWordListPath, kWordListDest);
+            std::cout << dl.message << "\n";
+            if (dl.success) g_dataset.loadAll();
+            break;
+        }
 
         case Command::Home: {
             bool running = true;
@@ -98,7 +145,7 @@ int main(int argc, char** argv) {
                         runTypingLoop(config);
                         break;
                     case HomeAction::Stats:
-                        std::cout << "Stats aren't implemented yet.\n";
+                        printStats();
                         std::cout << "Press Enter to return...";
                         std::cin.get();
                         break;
@@ -115,10 +162,6 @@ int main(int argc, char** argv) {
             break;
         }
 
-        case Command::Download:
-        case Command::Update:
-        case Command::Stats:
-        case Command::History:
         case Command::Config:
             std::cout << "This command isn't implemented yet.\n";
             break;

@@ -19,13 +19,19 @@
     <ClCompile Include="D:\workspace\dashtype\src\typing_screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\workspace\dashtype\src\personal_best.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D:\workspace\dashtype\src\results_screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\workspace\dashtype\src\home_screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\workspace\dashtype\src\dataset_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\workspace\dashtype\src\database.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\workspace\dashtype\src\downloader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,4 @@
 #include "results_screen.hpp"
-#include "personal_best.hpp"
 
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/event.hpp>
@@ -9,17 +8,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numeric>
 #include <string>
 #include <vector>
-#include <numeric>
 
 using namespace ftxui;
 
 namespace {
 
-// Builds a simple 8-level sparkline (using block characters) from the
-// per-second WPM samples, so we get a WPM-over-time graph without
-// depending on FTXUI's lower-level canvas API.
 struct ChartData {
     std::vector<std::string> rows;
     double maxWpm = 0.0;
@@ -66,11 +62,12 @@ ChartData buildBarChart(const std::vector<WpmSample>& samples, int height, int b
                                 : (rowFromBottom == fullRows) ? kBlocks[remainder]
                                                                : " ";
             for (int b = 0; b < barWidth; ++b) data.rows[r] += cell;
-            data.rows[r] += " ";  // gap between bars
+            data.rows[r] += " ";
         }
     }
     return data;
 }
+
 std::string formatFixed(double value, int decimals) {
     char buf[32];
     snprintf(buf, sizeof(buf), "%.*f", decimals, value);
@@ -81,13 +78,26 @@ std::string formatFixed(double value, int decimals) {
 
 ResultsAction runResultsScreen(const ResultMetrics& metrics,
                                 const std::vector<WpmSample>& samples,
-                                int durationSeconds) {
+                                const AppConfig& config,
+                                Database& db) {
     auto screen = ScreenInteractive::Fullscreen();
     ResultsAction chosenAction = ResultsAction::NewTest;
-    int selected = 0;  // 0 = New Test, 1 = Exit
+    int selected = 0;
 
-    std::optional<double> previousBest = loadPersonalBest(durationSeconds);
-    bool isNewBest = checkAndUpdatePersonalBest(durationSeconds, metrics.wpm);
+    std::optional<double> previousBest = db.personalBest(config.timeSeconds);
+    bool isNewBest = !previousBest.has_value() || metrics.wpm > *previousBest;
+
+    TestRecord record;
+    record.durationSeconds = config.timeSeconds;
+    record.wpm = metrics.wpm;
+    record.rawWpm = metrics.rawWpm;
+    record.accuracyPercent = metrics.accuracyPercent;
+    record.consistencyPercent = metrics.consistencyPercent;
+    record.correctChars = metrics.correctChars;
+    record.errors = metrics.errors;
+    record.mode = toString(config.mode);
+    record.difficulty = toString(config.difficulty);
+    db.recordTest(record);
 
     ChartData chart = buildBarChart(samples, 10, 2);
 
@@ -140,7 +150,7 @@ ResultsAction runResultsScreen(const ResultMetrics& metrics,
         }) | center);
         content.push_back(hbox({
             text("Time         ") | dim,
-            text(std::to_string(durationSeconds) + "s"),
+            text(std::to_string(config.timeSeconds) + "s"),
         }) | center);
 
         content.push_back(text(""));
@@ -195,11 +205,7 @@ ResultsAction runResultsScreen(const ResultMetrics& metrics,
 
         Element panel = vbox(content) | border |
                          size(WIDTH, GREATER_THAN, Terminal::Size().dimx - 2);
-        return vbox({
-            filler(),
-            panel,
-            filler(),
-        });
+        return vbox({filler(), panel, filler()});
     });
 
     auto component = CatchEvent(renderer, [&](Event event) -> bool {
