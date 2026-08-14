@@ -146,16 +146,10 @@ dashtype/
 - **Networking is platform-specific by design.** Windows uses WinHTTP (built into the OS, no extra dependency); Linux uses libcurl. Both implement the same `downloadWordList()` interface, so the rest of the app doesn't know or care which one is active.
 - **Word list license:** the bundled starter list was composed for this project and carries no licensing restrictions. `dashtype download` can optionally fetch [google-10000-english](https://github.com/first20hours/google-10000-english), which is free for educational/personal use but not unrestricted public domain — check that repo's license before redistributing a build that bundles it directly.
 
-## Roadmap / known gaps
-
-- [ ] Code mode / endless mode
-- [ ] Colorblind-friendly palette option
-- [ ] Configurable cursor style
-- [ ] Larger bundled starter word list by default
 
 ## License
 
-*(Add your chosen license here — e.g. MIT.)*
+MIT
 
 ## Acknowledgements
 
