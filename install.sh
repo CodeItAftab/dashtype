@@ -41,7 +41,7 @@ fi
 
 chmod +x "$INSTALL_DIR/dashtype"
 
-# Create symlink
+# Create/update symlink
 ln -sf "$INSTALL_DIR/dashtype" "$BIN_DIR/dashtype"
 
 # PATH configuration
@@ -53,6 +53,7 @@ add_to_shell_config() {
   # Create the shell config file if it doesn't exist
   touch "$config_file"
 
+  # Add PATH entry if it isn't already present
   if ! grep -Fxq "$PATH_LINE" "$config_file"; then
     echo "" >> "$config_file"
     echo "# dashtype" >> "$config_file"
@@ -65,25 +66,11 @@ add_to_shell_config() {
 # Configure Bash
 add_to_shell_config "$HOME/.bashrc"
 
-# Configure Zsh if available
+# Configure Zsh
 add_to_shell_config "$HOME/.zshrc"
-
-# Make dashtype available to the current installer process
-export PATH="$BIN_DIR:$PATH"
 
 echo ""
 echo "Dashtype installed successfully!"
 echo "Executable: $BIN_DIR/dashtype"
 echo ""
-
-# Verify the executable itself
-if [ ! -x "$BIN_DIR/dashtype" ]; then
-  echo "Installation failed: dashtype is not executable." >&2
-  exit 1
-fi
-
-echo "Run the following command to reload your shell:"
-echo "  source ~/.bashrc"
-echo ""
-echo "Then run:"
-echo "  dashtype"
+echo "Restart your terminal to use 'dashtype'."
