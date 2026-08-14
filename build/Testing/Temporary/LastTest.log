@@ -1,0 +1,42 @@
+Start testing: Aug 14 13:17 India Standard Time
+----------------------------------------------------------
+1/2 Testing: metrics_test
+1/2 Test: metrics_test
+Command: "D:/workspace/dashtype/build/Debug/metrics_test.exe"
+Directory: D:/workspace/dashtype/build
+"metrics_test" start time: Aug 14 13:17 India Standard Time
+Output:
+----------------------------------------------------------
+test_perfect_typing passed
+test_one_uncorrected_error passed
+test_corrected_error_still_counts_against_accuracy passed
+All metrics tests passed.
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"metrics_test" end time: Aug 14 13:17 India Standard Time
+"metrics_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: typing_engine_test
+2/2 Test: typing_engine_test
+Command: "D:/workspace/dashtype/build/Debug/typing_engine_test.exe"
+Directory: D:/workspace/dashtype/build
+"typing_engine_test" start time: Aug 14 13:17 India Standard Time
+Output:
+----------------------------------------------------------
+test_correct_typing passed
+test_incorrect_then_backspace passed
+test_extra_characters passed
+test_keystroke_log_persists_through_correction passed
+All typing_engine tests passed.
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"typing_engine_test" end time: Aug 14 13:17 India Standard Time
+"typing_engine_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 14 13:17 India Standard Time

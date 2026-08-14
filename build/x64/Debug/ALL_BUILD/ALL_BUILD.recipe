@@ -8,6 +8,12 @@
       <FullPath>D:\workspace\dashtype\build\Debug\dashtype.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
+      <FullPath>D:\workspace\dashtype\build\Debug\metrics_test.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\workspace\dashtype\build\Debug\typing_engine_test.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
       <FullPath>D:\workspace\dashtype\build\x64\Debug\ALL_BUILD</FullPath>
     </ProjectOutput>
   </ProjectOutputs>

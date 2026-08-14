@@ -1,5 +1,5 @@
 time 30
 mode words
-difficulty easy
+difficulty medium
 punctuation 0
-numbers 1
+numbers 0

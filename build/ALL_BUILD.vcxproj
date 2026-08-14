@@ -105,7 +105,7 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\workspace\dashtype\CmakeLists.txt">
+    <CustomBuild Include="D:\workspace\dashtype\CMakeLists.txt">
       <StdOutEncoding>UTF-8</StdOutEncoding>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/workspace/dashtype/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -182,6 +182,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{59D2856A-95C1-31EF-9E2C-5699E47CD08D}</Project>
       <Name>dom</Name>
     </ProjectReference>
+    <ProjectReference Include="D:\workspace\dashtype\build\metrics_test.vcxproj">
+      <Project>{323B3854-3F18-3DB4-8539-F1C937053EF1}</Project>
+      <Name>metrics_test</Name>
+    </ProjectReference>
     <ProjectReference Include="D:\workspace\dashtype\build\_deps\ftxui-build\screen.vcxproj">
       <Project>{546BF51F-C3B0-3321-B66E-F175ADF0ACA9}</Project>
       <Name>screen</Name>
@@ -189,6 +193,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="D:\workspace\dashtype\build\sqlite3lib.vcxproj">
       <Project>{5AB24F0F-7FA8-34D8-B3C3-0ADE0D0CCAF3}</Project>
       <Name>sqlite3lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\workspace\dashtype\build\typing_engine_test.vcxproj">
+      <Project>{C3C5BA64-54CE-3445-952D-28984A687443}</Project>
+      <Name>typing_engine_test</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

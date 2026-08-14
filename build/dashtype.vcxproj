@@ -308,7 +308,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\workspace\dashtype\CmakeLists.txt">
+    <CustomBuild Include="D:\workspace\dashtype\CMakeLists.txt">
       <StdOutEncoding>UTF-8</StdOutEncoding>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/workspace/dashtype/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -375,10 +375,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\workspace\dashtype\src\home_screen.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\dataset_manager.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\database.cpp" />
-    <ClCompile Include="D:\workspace\dashtype\src\downloader.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\config_store.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\dataset_meta.cpp" />
     <ClCompile Include="D:\workspace\dashtype\src\app_paths.cpp" />
+    <ClCompile Include="D:\workspace\dashtype\src\downloader_win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\workspace\dashtype\build\ZERO_CHECK.vcxproj">
