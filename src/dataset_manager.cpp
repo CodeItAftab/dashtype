@@ -1,9 +1,12 @@
 #include "dataset_manager.hpp"
+#include "app_paths.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <memory>
 #include <sstream>
+
 
 namespace {
 
@@ -91,7 +94,9 @@ void DatasetManager::loadAll() {
     words_.clear();
     quotes_.clear();
 
+    std::string exeDir = exeDirectory();
     std::vector<std::string> wordCandidates = {
+        exeDir + "data/words/common-1k.txt",
         "data/words/common-1k.txt",
         "../data/words/common-1k.txt",
     };
@@ -100,6 +105,7 @@ void DatasetManager::loadAll() {
     }
 
     std::vector<std::string> quoteCandidates = {
+        exeDir + "data/quotes/quotes.json",
         "data/quotes/quotes.json",
         "../data/quotes/quotes.json",
     };
@@ -118,19 +124,31 @@ void DatasetManager::loadFallbackQuotes() {
 }
 
 std::vector<std::string> DatasetManager::filterByDifficulty(Difficulty difficulty) const {
+    if (words_.empty()) return words_;
+
+    std::vector<std::string> sorted = words_;
+    std::sort(sorted.begin(), sorted.end(),
+              [](const std::string& a, const std::string& b) {
+                  return a.size() < b.size();
+              });
+
+    std::size_t n = sorted.size();
+    std::size_t thirdEnd = n / 3;
+    std::size_t twoThirdsEnd = (n * 2) / 3;
+
     std::vector<std::string> result;
-    for (const auto& w : words_) {
-        std::size_t len = w.size();
-        bool match = false;
-        switch (difficulty) {
-            case Difficulty::Easy:   match = (len <= 4); break;
-            case Difficulty::Medium: match = (len >= 5 && len <= 7); break;
-            case Difficulty::Hard:   match = (len >= 8); break;
-        }
-        if (match) result.push_back(w);
+    switch (difficulty) {
+        case Difficulty::Easy:
+            result.assign(sorted.begin(), sorted.begin() + thirdEnd);
+            break;
+        case Difficulty::Medium:
+            result.assign(sorted.begin() + thirdEnd, sorted.begin() + twoThirdsEnd);
+            break;
+        case Difficulty::Hard:
+            result.assign(sorted.begin() + twoThirdsEnd, sorted.end());
+            break;
     }
-    // If the filtered bucket is too small to feel varied, fall back to the
-    // full pool rather than repeating a handful of words constantly.
+
     if (result.size() < 15) return words_;
     return result;
 }

@@ -1,0 +1,5 @@
+time 30
+mode words
+difficulty easy
+punctuation 0
+numbers 1

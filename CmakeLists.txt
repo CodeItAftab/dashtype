@@ -35,6 +35,9 @@ add_executable(dashtype
   src/dataset_manager.cpp
   src/database.cpp
   src/downloader.cpp
+  src/config_store.cpp
+  src/dataset_meta.cpp
+  src/app_paths.cpp
 )
 
 target_include_directories(dashtype PRIVATE src)
@@ -47,5 +50,16 @@ target_link_libraries(dashtype
 add_custom_command(TARGET dashtype POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
       ${CMAKE_SOURCE_DIR}/data
-      ${CMAKE_BINARY_DIR}/data
+      $<TARGET_FILE_DIR:dashtype>/data
 )
+
+# --- Packaging ---------------------------------------------------------
+# Run `cpack` from the build dir after building to produce a distributable
+# .zip containing the exe + data/ folder together.
+install(TARGETS dashtype RUNTIME DESTINATION .)
+install(DIRECTORY data/ DESTINATION data)
+
+set(CPACK_PACKAGE_NAME "dashtype")
+set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_GENERATOR "ZIP")
+include(CPack)

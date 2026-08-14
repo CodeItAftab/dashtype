@@ -2,16 +2,7 @@
 #include <string>
 
 enum class Command {
-    Home,
-    Start,
-    Download,
-    Update,
-    Stats,
-    History,
-    Config,
-    Version,
-    Help,
-    Unknown
+    Home, Start, Download, Update, Stats, History, Config, Version, Help, Unknown
 };
 
 enum class Mode { Words, Quotes };
@@ -26,7 +17,7 @@ struct AppConfig {
     bool numbers = false;
 };
 
-AppConfig parseArgs(int argc, char** argv);
+AppConfig parseArgs(int argc, char** argv, AppConfig defaults = AppConfig());
 
 std::string toString(Mode mode);
 std::string toString(Difficulty difficulty);

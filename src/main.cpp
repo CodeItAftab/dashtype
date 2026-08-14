@@ -6,6 +6,9 @@
 #include "dataset_manager.hpp"
 #include "database.hpp"
 #include "downloader.hpp"
+#include "config_store.hpp"
+#include "dataset_meta.hpp"
+#include "app_paths.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -20,7 +23,8 @@ Database g_db;
 
 const char* kWordListHost = "raw.githubusercontent.com";
 const char* kWordListPath = "/first20hours/google-10000-english/master/google-10000-english.txt";
-const char* kWordListDest = "data/words/common-1k.txt";
+const std::string kWordListDest = exeDirectory() + "data/words/common-1k.txt";
+const int kUpdateThresholdHours = 24;
 
 std::string configSummary(const AppConfig& config) {
     return std::to_string(config.timeSeconds) + "s \u00b7 " +
@@ -31,11 +35,11 @@ void printHelp() {
     std::cout << "Usage: dashtype <command> [options]\n\n"
               << "Commands:\n"
               << "  start      Start a typing test\n"
-              << "  download   Download additional typing material\n"
-              << "  update     Update local typing material\n"
+              << "  download   Force re-download typing material\n"
+              << "  update     Refresh typing material if it's stale\n"
               << "  stats      Show personal statistics\n"
               << "  history    Show previous tests\n"
-              << "  config     Configure preferences\n"
+              << "  config     Change and save default preferences\n"
               << "  version    Show version\n"
               << "  help       Show this help\n\n"
               << "Options for 'start':\n"
@@ -95,14 +99,32 @@ void runTypingLoop(const AppConfig& config) {
     }
 }
 
+void runDownload(bool forceRefresh) {
+    if (!forceRefresh && !datasetNeedsUpdate(kUpdateThresholdHours)) {
+        std::cout << "Local dataset is already up to date (checked within the last "
+                  << kUpdateThresholdHours << "h). Use 'dashtype download' to force a refresh.\n";
+        return;
+    }
+
+    std::cout << "Downloading typing material...\n";
+    DownloadResult dl = downloadWordList(kWordListHost, kWordListPath, kWordListDest);
+    std::cout << dl.message << "\n";
+    if (dl.success) {
+        markDatasetUpdated();
+        g_dataset.loadAll();
+    }
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
-    AppConfig config = parseArgs(argc, argv);
+
+    AppConfig savedDefaults = loadConfig();
+    AppConfig config = parseArgs(argc, argv, savedDefaults);
 
     g_dataset.loadAll();
-    g_db.open("dashtype.db");
+    g_db.open(exeDirectory() + "dashtype.db");
 
     switch (config.command) {
         case Command::Start:
@@ -126,11 +148,20 @@ int main(int argc, char** argv) {
             break;
 
         case Command::Download:
-        case Command::Update: {
-            std::cout << "Downloading typing material...\n";
-            DownloadResult dl = downloadWordList(kWordListHost, kWordListPath, kWordListDest);
-            std::cout << dl.message << "\n";
-            if (dl.success) g_dataset.loadAll();
+            runDownload(/*forceRefresh=*/true);
+            break;
+
+        case Command::Update:
+            runDownload(/*forceRefresh=*/false);
+            break;
+
+        case Command::Config: {
+            HomeScreenResult result = runHomeScreen(config);
+            saveConfig(result.config);
+            std::cout << "Settings saved as new defaults.\n";
+            if (result.action == HomeAction::Start) {
+                runTypingLoop(result.config);
+            }
             break;
         }
 
@@ -139,6 +170,7 @@ int main(int argc, char** argv) {
             while (running) {
                 HomeScreenResult home = runHomeScreen(config);
                 config = home.config;
+                saveConfig(config);
 
                 switch (home.action) {
                     case HomeAction::Start:
@@ -161,10 +193,6 @@ int main(int argc, char** argv) {
             }
             break;
         }
-
-        case Command::Config:
-            std::cout << "This command isn't implemented yet.\n";
-            break;
 
         case Command::Unknown:
         default:

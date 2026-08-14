@@ -29,8 +29,8 @@ Difficulty parseDifficulty(const std::string& s) {
 
 }  // namespace
 
-AppConfig parseArgs(int argc, char** argv) {
-    AppConfig config;
+AppConfig parseArgs(int argc, char** argv, AppConfig defaults) {
+    AppConfig config = defaults;
 
     std::vector<std::string> args(argv + 1, argv + argc);
     if (args.empty()) {
@@ -42,7 +42,6 @@ AppConfig parseArgs(int argc, char** argv) {
 
     for (size_t i = 1; i < args.size(); ++i) {
         const std::string& arg = args[i];
-
         if (arg == "--time" && i + 1 < args.size()) {
             config.timeSeconds = std::stoi(args[++i]);
         } else if (arg == "--mode" && i + 1 < args.size()) {
