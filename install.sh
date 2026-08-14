@@ -24,7 +24,7 @@ curl -fsSL "$ASSET_URL" -o /tmp/dashtype.tar.gz
 
 echo "Extracting..."
 
-# Clean previous installation
+# Remove previous installation
 rm -rf "$INSTALL_DIR"/*
 
 tar -xzf /tmp/dashtype.tar.gz \
@@ -41,30 +41,34 @@ fi
 
 chmod +x "$INSTALL_DIR/dashtype"
 
-# Create/update symlink
+# Create symlink
 ln -sf "$INSTALL_DIR/dashtype" "$BIN_DIR/dashtype"
 
-# Add ~/.local/bin to PATH permanently
+# PATH configuration
 PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
 
 add_to_shell_config() {
   local config_file="$1"
 
-  if [ -f "$config_file" ]; then
-    if ! grep -Fxq "$PATH_LINE" "$config_file"; then
-      echo "" >> "$config_file"
-      echo "# dashtype" >> "$config_file"
-      echo "$PATH_LINE" >> "$config_file"
+  # Create the shell config file if it doesn't exist
+  touch "$config_file"
 
-      echo "Added ~/.local/bin to $config_file"
-    fi
+  if ! grep -Fxq "$PATH_LINE" "$config_file"; then
+    echo "" >> "$config_file"
+    echo "# dashtype" >> "$config_file"
+    echo "$PATH_LINE" >> "$config_file"
+
+    echo "Added ~/.local/bin to $config_file"
   fi
 }
 
+# Configure Bash
 add_to_shell_config "$HOME/.bashrc"
+
+# Configure Zsh if available
 add_to_shell_config "$HOME/.zshrc"
 
-# Make dashtype available in the current shell immediately
+# Make dashtype available to the current installer process
 export PATH="$BIN_DIR:$PATH"
 
 echo ""
@@ -72,12 +76,14 @@ echo "Dashtype installed successfully!"
 echo "Executable: $BIN_DIR/dashtype"
 echo ""
 
-# Verify command works
-if command -v dashtype >/dev/null 2>&1; then
-  echo "You can now run:"
-  echo "  dashtype"
-else
-  echo "Installation completed, but dashtype was not found in PATH."
-  echo "Restart your terminal and run:"
-  echo "  dashtype"
+# Verify the executable itself
+if [ ! -x "$BIN_DIR/dashtype" ]; then
+  echo "Installation failed: dashtype is not executable." >&2
+  exit 1
 fi
+
+echo "Run the following command to reload your shell:"
+echo "  source ~/.bashrc"
+echo ""
+echo "Then run:"
+echo "  dashtype"
