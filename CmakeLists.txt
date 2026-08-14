@@ -23,8 +23,16 @@ target_include_directories(sqlite3lib PUBLIC ${sqlite3_SOURCE_DIR})
 
 find_package(Threads REQUIRED)
 
-add_executable(dashtype
-  src/main.cpp
+# Platform-specific networking backend: WinHTTP on Windows (no external
+# dependency needed), libcurl on Linux (needs libcurl4-openssl-dev installed).
+if(WIN32)
+  set(PLATFORM_DOWNLOADER_SRC src/downloader_win.cpp)
+else()
+  find_package(CURL REQUIRED)
+  set(PLATFORM_DOWNLOADER_SRC src/downloader_linux.cpp)
+endif()
+
+set(DASHTYPE_CORE_SOURCES
   src/cli_parser.cpp
   src/text_buffer.cpp
   src/typing_engine.cpp
@@ -34,18 +42,25 @@ add_executable(dashtype
   src/home_screen.cpp
   src/dataset_manager.cpp
   src/database.cpp
-  src/downloader.cpp
   src/config_store.cpp
   src/dataset_meta.cpp
   src/app_paths.cpp
+  ${PLATFORM_DOWNLOADER_SRC}
 )
 
+add_executable(dashtype src/main.cpp ${DASHTYPE_CORE_SOURCES})
 target_include_directories(dashtype PRIVATE src)
 
 target_link_libraries(dashtype
   PRIVATE ftxui::screen ftxui::dom ftxui::component
-          sqlite3lib Threads::Threads winhttp
+          sqlite3lib Threads::Threads
 )
+
+if(WIN32)
+  target_link_libraries(dashtype PRIVATE winhttp)
+else()
+  target_link_libraries(dashtype PRIVATE CURL::libcurl)
+endif()
 
 add_custom_command(TARGET dashtype POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -53,13 +68,25 @@ add_custom_command(TARGET dashtype POST_BUILD
       $<TARGET_FILE_DIR:dashtype>/data
 )
 
-# --- Packaging ---------------------------------------------------------
-# Run `cpack` from the build dir after building to produce a distributable
-# .zip containing the exe + data/ folder together.
 install(TARGETS dashtype RUNTIME DESTINATION .)
 install(DIRECTORY data/ DESTINATION data)
 
 set(CPACK_PACKAGE_NAME "dashtype")
 set(CPACK_PACKAGE_VERSION "0.1.0")
-set(CPACK_GENERATOR "ZIP")
+if(WIN32)
+  set(CPACK_GENERATOR "ZIP")
+else()
+  set(CPACK_GENERATOR "TGZ")
+endif()
 include(CPack)
+
+# --- Tests ---------------------------------------------------------------
+enable_testing()
+
+add_executable(metrics_test tests/metrics_test.cpp src/metrics.cpp src/typing_engine.cpp)
+target_include_directories(metrics_test PRIVATE src)
+add_test(NAME metrics_test COMMAND metrics_test)
+
+add_executable(typing_engine_test tests/typing_engine_test.cpp src/typing_engine.cpp)
+target_include_directories(typing_engine_test PRIVATE src)
+add_test(NAME typing_engine_test COMMAND typing_engine_test)
