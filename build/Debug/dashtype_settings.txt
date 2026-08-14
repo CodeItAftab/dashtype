@@ -1,5 +1,0 @@
-time 30
-mode words
-difficulty medium
-punctuation 0
-numbers 0

@@ -1,0 +1,5 @@
+build/
+*.db
+dashtype_settings.txt
+dataset_meta.txt
+dashtype_bests.txt
