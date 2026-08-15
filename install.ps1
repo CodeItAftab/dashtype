@@ -2,14 +2,14 @@ $ErrorActionPreference = "Stop"
 
 $repo = "CodeItAftab/dashtype"
 $installDir = Join-Path $env:LOCALAPPDATA "dashtype"
-$zipPath = Join-Path $env:TEMP "dashtype-windows.zip"
+$zipPath = Join-Path $installDir "dashtype.zip"
 
 Write-Host ""
 Write-Host "Installing Dashtype..."
 Write-Host ""
 
 # --------------------------------------------------
-# Get latest release
+# Fetch latest release
 # --------------------------------------------------
 
 Write-Host "Fetching latest dashtype release..."
@@ -24,14 +24,33 @@ catch {
     exit 1
 }
 
-$asset = $release.assets | Where-Object {
-    $_.name -eq "dashtype-windows.zip"
-} | Select-Object -First 1
+$asset = $release.assets |
+    Where-Object { $_.name -eq "dashtype-windows.zip" } |
+    Select-Object -First 1
 
 if (-not $asset) {
     Write-Error "Could not find dashtype-windows.zip in the latest release."
     exit 1
 }
+
+# --------------------------------------------------
+# Prepare installation directory
+# --------------------------------------------------
+
+Write-Host "Preparing installation directory..."
+
+if (Test-Path $installDir) {
+    Remove-Item `
+        -Path $installDir `
+        -Recurse `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
+
+New-Item `
+    -ItemType Directory `
+    -Path $installDir `
+    -Force | Out-Null
 
 # --------------------------------------------------
 # Download
@@ -51,24 +70,6 @@ catch {
 }
 
 # --------------------------------------------------
-# Prepare installation directory
-# --------------------------------------------------
-
-Write-Host "Preparing installation directory..."
-
-if (Test-Path $installDir) {
-    Remove-Item `
-        -Path $installDir `
-        -Recurse `
-        -Force
-}
-
-New-Item `
-    -ItemType Directory `
-    -Path $installDir `
-    -Force | Out-Null
-
-# --------------------------------------------------
 # Extract
 # --------------------------------------------------
 
@@ -81,12 +82,17 @@ try {
         -Force
 }
 catch {
-    Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
     Write-Error "Failed to extract Dashtype."
     exit 1
 }
 
-Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+# Delete ZIP
+if (Test-Path $zipPath) {
+    Remove-Item `
+        -Path $zipPath `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
 
 # --------------------------------------------------
 # Find executable
@@ -109,46 +115,41 @@ if (-not $exe) {
 $exePath = $exe.FullName
 $exeDir = $exe.DirectoryName
 
-Write-Host "Found:"
+Write-Host "Found executable:"
 Write-Host "  $exePath"
 
 # --------------------------------------------------
-# Add executable directory to User PATH
+# Configure User PATH
 # --------------------------------------------------
 
 Write-Host "Configuring PATH..."
 
-$userPath = [Environment]::GetEnvironmentVariable(
-    "Path",
-    "User"
-)
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 
 if ($null -eq $userPath) {
     $userPath = ""
 }
 
-# Split PATH into individual entries
 $pathEntries = @(
     $userPath -split ';' |
     ForEach-Object { $_.Trim() } |
     Where-Object { $_ -ne "" }
 )
 
-# Check for the executable directory
 $pathExists = $false
 
 foreach ($entry in $pathEntries) {
     try {
-        if (
-            [System.IO.Path]::GetFullPath($entry).TrimEnd('\') -ieq
-            [System.IO.Path]::GetFullPath($exeDir).TrimEnd('\')
-        ) {
+        $entryFull = [System.IO.Path]::GetFullPath($entry).TrimEnd('\')
+        $exeDirFull = [System.IO.Path]::GetFullPath($exeDir).TrimEnd('\')
+
+        if ($entryFull -ieq $exeDirFull) {
             $pathExists = $true
             break
         }
     }
     catch {
-        # Ignore malformed PATH entries
+        # Ignore invalid PATH entries
     }
 }
 
@@ -171,7 +172,7 @@ else {
 }
 
 # --------------------------------------------------
-# Update current PowerShell process PATH
+# Update current PowerShell PATH
 # --------------------------------------------------
 
 $currentPathEntries = @(
@@ -184,16 +185,16 @@ $currentPathExists = $false
 
 foreach ($entry in $currentPathEntries) {
     try {
-        if (
-            [System.IO.Path]::GetFullPath($entry).TrimEnd('\') -ieq
-            [System.IO.Path]::GetFullPath($exeDir).TrimEnd('\')
-        ) {
+        $entryFull = [System.IO.Path]::GetFullPath($entry).TrimEnd('\')
+        $exeDirFull = [System.IO.Path]::GetFullPath($exeDir).TrimEnd('\')
+
+        if ($entryFull -ieq $exeDirFull) {
             $currentPathExists = $true
             break
         }
     }
     catch {
-        # Ignore malformed PATH entries
+        # Ignore invalid PATH entries
     }
 }
 
@@ -209,32 +210,30 @@ Write-Host ""
 Write-Host "Verifying installation..."
 
 if (-not (Test-Path $exePath)) {
-    Write-Error "Installation failed: executable does not exist."
+    Write-Error "Installation failed: dashtype.exe does not exist."
     exit 1
 }
 
-$command = Get-Command "dashtype" -ErrorAction SilentlyContinue
+Write-Host ""
+Write-Host "Dashtype installed successfully!"
+Write-Host ""
+Write-Host "Executable:"
+Write-Host "  $exePath"
+Write-Host ""
+
+$command = Get-Command dashtype -ErrorAction SilentlyContinue
 
 if ($command) {
-
+    Write-Host "Dashtype is available in this terminal."
     Write-Host ""
-    Write-Host "Dashtype installed successfully!"
-    Write-Host ""
-    Write-Host "Executable:"
-    Write-Host "  $exePath"
-    Write-Host ""
-    Write-Host "You can now run:"
+    Write-Host "Run:"
     Write-Host "  dashtype"
 }
 else {
-
-    Write-Host ""
-    Write-Host "Dashtype was installed successfully."
-    Write-Host ""
-    Write-Host "Executable:"
-    Write-Host "  $exePath"
-    Write-Host ""
     Write-Host "Close this terminal and open a new PowerShell window."
+    Write-Host ""
     Write-Host "Then run:"
     Write-Host "  dashtype"
 }
+
+Write-Host ""
